@@ -21,7 +21,7 @@ parser.add_argument('-p', type=str, help="password dict.(exp:password.txt)", def
 parser.add_argument('-c', type=str, help="captcha identify api addr", default="")
 args = parser.parse_args()
 
-running = True  # 全局标志位
+running = True
 
 
 def signal_handler(sig, frame):
@@ -29,7 +29,6 @@ def signal_handler(sig, frame):
     running = False
 
 
-# 注册信号处理程序
 signal.signal(signal.SIGINT, signal_handler)
 
 
@@ -328,3 +327,4 @@ if __name__ == '__main__':
         if not running:
             print(Fore.RED + '[-] User actively logs out!')
             sys.exit(0)
+

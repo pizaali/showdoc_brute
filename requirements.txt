@@ -1,0 +1,5 @@
+requests
+coloramam
+aiohttp
+Pillow
+ddddocr

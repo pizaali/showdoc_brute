@@ -165,8 +165,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
         captcha_id = showdoc_captcha_id(showdoc_url)
         if captcha_id == 'request error' and exit_num != 5:
             print(Fore.RED + '\n[-] Failed to obtain verification code id!')
-            logger(filename='error.log', io_type='a',
-                   string=f'[{showdoc_url}/][{int(time.time())}] captcha id error!{username}:{password}\n')
+            logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha id error!{username}:{password}\n')
             exit_num = exit_num + 1
         elif exit_num == 5:
             return '', ''
@@ -181,8 +180,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
             captcha_base64 = showdoc_captcha_base64(showdoc_url, captcha_id)
             if captcha_base64 == 'request error' and exit_num != 5:
                 print(Fore.RED + '\n[-] Failed to obtain verification code image!')
-                logger(filename='error.log', io_type='a',
-                       string=f'[{showdoc_url}/][{int(time.time())}] captcha base64 error!{username}:{password}\n')
+                logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha base64 error!{username}:{password}\n')
                 exit_num = exit_num + 1
             elif exit_num == 5:
                 return '', ''
@@ -199,8 +197,7 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
                 captcha_code = showdoc_captcha_code(captcha_api_url, captcha_base64)
             if captcha_code == 'request error' and exit_num != 5:
                 print(Fore.RED + '\n[-] Verification code decoding failed!')
-                logger(filename='error.log', io_type='a',
-                       string=f'[{showdoc_url}/][{int(time.time())}] captcha code error!{username}:{password}\n')
+                logger(filename='error.log', io_type='a', string=f'[{showdoc_url}/][{int(time.time())}] captcha code error!{username}:{password}\n')
                 exit_num = exit_num + 1
             elif exit_num == 5:
                 return '', ''
@@ -254,8 +251,7 @@ def run():
                         print(Fore.GREEN + f'{username}', end='')
                         print(Fore.WHITE + ' password:', end='')
                         print(Fore.GREEN + f'{password}')
-                        logger(filename='login_success.txt', io_type='a',
-                               string=f'[{showdoc_url}/] {username}/{password}\n')
+                        logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
                         break
         elif not os.path.exists(args.u) and os.path.exists(args.p):
             username = args.u
@@ -276,8 +272,7 @@ def run():
                     print(Fore.GREEN + f'{username}', end='')
                     print(Fore.WHITE + ' password:', end='')
                     print(Fore.GREEN + f'{password}')
-                    logger(filename='login_success.txt', io_type='a',
-                           string=f'[{showdoc_url}/] {username}/{password}\n')
+                    logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
                     break
         elif os.path.exists(args.u) and not os.path.exists(args.p):
             user_list = file_to_list(filename=args.u)
@@ -298,8 +293,7 @@ def run():
                     print(Fore.GREEN + f'{username}', end='')
                     print(Fore.WHITE + ' password:', end='')
                     print(Fore.GREEN + f'{password}')
-                    logger(filename='login_success.txt', io_type='a',
-                           string=f'[{showdoc_url}/] {username}/{password}\n')
+                    logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
         else:
             username = args.u
             password = args.p
@@ -327,4 +321,3 @@ if __name__ == '__main__':
         if not running:
             print(Fore.RED + '[-] User actively logs out!')
             sys.exit(0)
-

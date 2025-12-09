@@ -5,6 +5,7 @@ import time
 import sys
 import argparse
 import ddddocr
+import os
 from colorama import Fore, init
 
 
@@ -33,10 +34,14 @@ def req_header(url):
 
 def check_params():
     if args.t != '':
-        if args.u != '' and args.p != '':
-            return True
+        if os.path.exists(args.u) and os.path.getsize(args.u) != 0:
+            if os.path.exists(args.p) and os.path.getsize(args.p) != 0:
+                return True
+            else:
+                print(Fore.RED + '[-] Password dictionary is not specified or the content is empty!')
+                sys.exit()
         else:
-            print(Fore.RED + '[-] No target username or password dictionary specified!')
+            print(Fore.RED + '[-] Username dictionary is not specified or the content is empty!')
             sys.exit()
     else:
         print(Fore.RED + '[-] No target showdoc address specified!')

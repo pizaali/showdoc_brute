@@ -1,6 +1,6 @@
 # showdoc_brute
 ## dec
-Project depends on https://github.com/f0ng/captcha-killer-modified/
+Project reference https://github.com/f0ng/captcha-killer-modified/
 ## using
 ```
 # install requirements

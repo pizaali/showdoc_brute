@@ -5,7 +5,7 @@ Project reference https://github.com/f0ng/captcha-killer-modified/
 ```
 # install requirements
 pip3 install -r requirements.txt
-# start captcha api
+# start captcha api(No need)
 python3 codereg.py
 # start brute
 python3 showdoc_brute.py -t http://showdoc.demo.com/ -u user.txt -p pass.txt
